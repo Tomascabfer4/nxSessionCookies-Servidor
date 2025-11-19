@@ -31,7 +31,7 @@ Para iniciar sesión puedes usar las siguientes credenciales:
 2. Se ha creado el archivo users.json
 3. Se comprueba que el usuario esta en dicho archivo para permitir hacer login.
 4. La cookie se borra al pasar 10 segundos y al hacer logout
-5. Solo podran acceder a Dashboard/Acerca de... a los usuarios logueados.
+5. Solo podran acceder a Dashboard/Acerca de... los usuarios logueados.
 
 ## Ejemplo de uso de cookies
 
