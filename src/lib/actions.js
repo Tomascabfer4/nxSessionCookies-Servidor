@@ -1,44 +1,43 @@
 'use server'
 import { redirect } from "next/navigation";
 import { deleteCookie, setCookie } from "@/lib/cookies";
-
-const usuarios = [
-  { nombre: 'pepe', key: 'pepe' },
-  { nombre: 'ana', key: 'ana' },
-]
+import path from 'path';
+import { promises as fs } from 'fs';
 
 export async function login(formData) {
   const LOGIN_URL = '/'
-
-  // Obtener usuario datos del formulario
-  const name = formData.get('name')
   const email = formData.get('email')
-  const key = formData.get('key')
+  const password = formData.get('password') 
   const callbackUrl = formData.get('callbackUrl') || LOGIN_URL
 
-  // Comprobar si credenciales son válidas
-  // const authenticated = true  // suponemos que son válidas
-  const encontrado = usuarios.find(usuario => name == usuario.nombre && key == usuario.key)
+  const filePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
+  
+  let users = [];
+  try {
+    const fileContents = await fs.readFile(filePath, 'utf8');
+    users = JSON.parse(fileContents);
+  } catch (error) {
+    console.error("Error: No se pudo leer el archivo users.json", error);
+    return;
+  }
 
-  if (!encontrado) return
+  const usuarioEncontrado = users.find(u => u.email === email && u.password === password);
 
-  // Si hay autenticación correcta, creamos cookie de sesión
-  await setCookie('session', { name, email })
+  if (!usuarioEncontrado) {
+    console.log("Login fallido: Credenciales incorrectas");
+    return;
+  }
+
+  await setCookie('session', { 
+    name: usuarioEncontrado.name, 
+    email: usuarioEncontrado.email 
+  })
 
   redirect(callbackUrl);
 }
 
-
-
 export async function logout() {
-  // Eliminamos cookie de sesión
-  deleteCookie('session')
+  await deleteCookie('session')
 
-  // redirect("/");   // No recarga si ya estamos en esta página
-
-  // Hack to reload page! https://github.com/vercel/next.js/discussions/49345#discussioncomment-6120148
   redirect('/?' + Math.random())
-
 }
-
-

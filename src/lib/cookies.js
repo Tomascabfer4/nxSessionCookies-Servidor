@@ -42,10 +42,5 @@ export function updateCookie(name, value) {
 export async function deleteCookie(name) {
   const cookieStore = await cookies()
  
-  cookieStore.set({
-    name,
-    value: "",
-    maxAge: 0,
-    httpOnly: true
-  });
+  cookieStore.delete(name);
 }
